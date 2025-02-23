@@ -5,11 +5,15 @@ public class PlayerMovement : MonoBehaviour
 {
     
     private Rigidbody2D playerRb;
-    public Transform groundCheck;
     
-    public float speed;
-    public float jumpForce;
-    public bool grounded;
+    [SerializeField] private Transform groundCheck;
+    
+    [Header("Player Movement")]
+    [SerializeField] private float speed;
+    [SerializeField] private float jumpForce;
+    [SerializeField] private bool grounded;
+    [SerializeField] private bool jumping;
+    private float jumpTimer;
 
     public void Start()
     {
@@ -19,8 +23,26 @@ public class PlayerMovement : MonoBehaviour
     public void Update()
     {
         UpdateMovement();
+        CheckJumpBuffer();
         UpdateJump();
         CheckGround();
+    }
+
+    private void CheckJumpBuffer()
+    {
+        if (jumpTimer > 0)
+        {
+            jumpTimer -= Time.deltaTime;
+            if (jumpTimer < 0)
+            {
+                jumpTimer = 0;
+            }
+        }
+
+        if (jumpTimer <= 0 && grounded)
+        {
+            jumping = false;
+        }
     }
 
     private void UpdateMovement()
@@ -40,16 +62,20 @@ public class PlayerMovement : MonoBehaviour
     {
         float inputVertical = Input.GetAxis("Vertical");
         
-        if (Mathf.Abs(inputVertical) > 0 && grounded)
+        if (!jumping && Mathf.Abs(inputVertical) > 0 && grounded)
         {
-            playerRb.linearVelocity = new Vector2(playerRb.linearVelocity.x, inputVertical * jumpForce);
+            playerRb.linearVelocity = new Vector2(playerRb.linearVelocity.x, jumpForce);
+            jumping = true;
+            jumpTimer = 0.3f;
         }
     }
 
     private void CheckGround()
     {
+        
+        
         grounded = false;
-        foreach (var col in Physics2D.OverlapCircleAll(groundCheck.position, 0.2f))
+        foreach (var col in Physics2D.OverlapCircleAll(groundCheck.position, 0.02f))
         {
             if (col.gameObject.layer == 7)
             {
@@ -58,4 +84,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
+
+   
 }
