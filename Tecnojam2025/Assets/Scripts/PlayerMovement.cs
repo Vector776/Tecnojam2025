@@ -18,9 +18,9 @@ public class PlayerMovement : MonoBehaviour
 
     public void Update()
     {
-        CheckGround();
         UpdateMovement();
         UpdateJump();
+        CheckGround();
     }
 
     private void UpdateMovement()
