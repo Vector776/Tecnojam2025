@@ -1,36 +1,61 @@
+using System;
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public GameObject player;
-    private Vector2 moveInput;
-    public Vector2 posicion;
-    private Rigidbody2D playerRb;
     
+    private Rigidbody2D playerRb;
+    public Transform groundCheck;
+    
+    public float speed;
+    public float jumpForce;
+    public bool grounded;
 
     public void Start()
     {
         playerRb = GetComponent<Rigidbody2D>();
-        playerRb.MovePosition(new Vector2(0, 0));
     }
 
     public void Update()
     {
-
-        float inputHorizontal = Input.GetAxisRaw("Horizontal");
-        float inputVertical = Input.GetAxisRaw("Vertical");
-        moveInput = new Vector2(inputHorizontal, inputVertical).normalized;
-
+        CheckGround();
+        UpdateMovement();
+        UpdateJump();
     }
 
-    private void FixedUpdate()
+    private void UpdateMovement()
     {
-        playerRb.MovePosition(playerRb.position + moveInput * Time.fixedDeltaTime);
-        posicion = playerRb.position;
+        float inputHorizontal = Input.GetAxis("Horizontal");
+        
+
+        if (Mathf.Abs(inputHorizontal) > 0)
+        {
+            playerRb.linearVelocity = new Vector2(inputHorizontal * speed, playerRb.linearVelocity.y);
+        }
+
+       
     }
 
+    private void UpdateJump()
+    {
+        float inputVertical = Input.GetAxis("Vertical");
+        
+        if (Mathf.Abs(inputVertical) > 0 && grounded)
+        {
+            playerRb.linearVelocity = new Vector2(playerRb.linearVelocity.x, inputVertical * jumpForce);
+        }
+    }
+
+    private void CheckGround()
+    {
+        grounded = false;
+        foreach (var col in Physics2D.OverlapCircleAll(groundCheck.position, 0.2f))
+        {
+            if (col.gameObject.layer == 7)
+            {
+                grounded = true;
+                break;
+            }
+        }
+    }
 }
