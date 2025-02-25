@@ -18,12 +18,9 @@ public class Cadaver : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                Destroy(gameObject);
-            }
+        if (other.CompareTag("Player") && Input.GetKeyDown(KeyCode.Q))
+        {    
+            gameObject.localScale = new Vector3(10f, 0, 0);  
         }
     }
 }
